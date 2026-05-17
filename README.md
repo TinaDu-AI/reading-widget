@@ -4,7 +4,6 @@
 
 > 本项目是微信读书官方 [`weread-skills`](https://cdn.weread.qq.com/skills/weread-skills.zip) 之上的一层**渲染壳**，数据全部来自微信读书官方 Agent API。详见下方[致谢](#致谢-acknowledgments)。
 
-![preview](preview.png)
 
 ## 怎么装
 
