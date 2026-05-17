@@ -1,0 +1,19 @@
+{
+  "name": "reading-widget",
+  "owner": {
+    "name": "TinaDu-AI"
+  },
+  "metadata": {
+    "description": "macOS desktop widget showing WeRead reading stats (streak, current book, quote) via Übersicht.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "reading-widget",
+      "description": "WeRead reading stats as a macOS desktop widget — streak, today/month time, current book + progress, year totals, daily quote.",
+      "source": "./",
+      "strict": false,
+      "skills": ["./"]
+    }
+  ]
+}
