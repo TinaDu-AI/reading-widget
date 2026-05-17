@@ -2,6 +2,8 @@
 
 一个挂在 macOS 桌面壁纸层的小组件，显示你的微信读书数据：连续阅读天数、今日/本月阅读时长、本月目标进度、正在读的书 + 进度、今年读完本数、当下金句。每 5 分钟自动刷新。
 
+> 本项目是微信读书官方 [`weread-skills`](https://cdn.weread.qq.com/skills/weread-skills.zip) 之上的一层**渲染壳**，数据全部来自微信读书官方 Agent API。详见下方[致谢](#致谢-acknowledgments)。
+
 ![preview](preview.png)
 
 ## 怎么装
@@ -86,6 +88,12 @@ reading-widget/
         └── index.coffee  # Übersicht widget 定义
 ```
 
+## 致谢 Acknowledgments
+
+本项目**完全建立在微信读书官方 Agent skill 之上** —— 所有数据接口（阅读统计、书架、阅读进度、热门划线等）都来自微信读书官方维护的 Agent Gateway 和它附带的 [`weread-skills`](https://cdn.weread.qq.com/skills/weread-skills.zip) 包。本项目只是把这些接口的输出重新组合渲染成一个桌面 widget，**不涉及任何接口逆向、抓包或绕过鉴权**。如果没有官方开放这套 Agent 能力，这个 widget 不可能存在。
+
+向微信读书团队致敬 🙏
+
 ## License
 
-MIT
+MIT（仅本仓库的渲染层代码；底层数据接口归微信读书所有，调用须遵守其 Agent 服务条款）
