@@ -1,5 +1,7 @@
 # Reading Widget · 微信读书桌面小卡片
 
+![preview](preview.png)
+
 一个挂在 macOS 桌面壁纸层的小组件，显示你的微信读书数据：连续阅读天数、今日/本月阅读时长、本月目标进度、正在读的书 + 进度、今年读完本数、当下金句。每 5 分钟自动刷新。
 
 > 本项目是微信读书官方 [`weread-skills`](https://cdn.weread.qq.com/skills/weread-skills.zip) 之上的一层**渲染壳**，数据全部来自微信读书官方 Agent API。详见下方[致谢](#致谢-acknowledgments)。
