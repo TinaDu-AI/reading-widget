@@ -5,69 +5,86 @@
 <meta http-equiv="refresh" content="{{REFRESH_SECONDS}}">
 <title>Reading</title>
 <style>
-  .r-card, .r-card * { box-sizing: border-box; font-family: -apple-system, "SF Pro Display", "PingFang SC", sans-serif; }
-  .r-card {
-    color: #e8dcc8;
-    width: 228px;
-    background: rgba(28, 22, 18, 0.85);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border: 1px solid rgba(255, 220, 180, 0.12);
-    border-radius: 15px;
-    padding: 13px;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
-    transform: scale(1.02);
-    transform-origin: top left;
+  /* Material 3 baseline (light) tokens */
+  :root {
+    --primary: #6750A4;
+    --on-surface: #1D1B20;
+    --on-surface-variant: #49454F;
+    --outline: #79747E;
+    --tertiary: #7D5260;
   }
-  .header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
-  .title { font-size: 11px; font-weight: 600; color: #e8dcc8; letter-spacing: 0.4px; }
-  .date { font-size: 9px; color: rgba(232, 220, 200, 0.5); font-variant-numeric: tabular-nums; }
+  .r-card, .r-card * { box-sizing: border-box; font-family: -apple-system, "SF Pro Display", "PingFang SC", sans-serif; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  .r-card {
+    position: relative;
+    color: var(--on-surface);
+    width: 264px;
+    background:
+      linear-gradient(157deg, rgba(252,252,255,0.86) 0%, rgba(246,247,253,0.87) 100%);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid rgba(103, 80, 164, 0.18);
+    border-radius: 20px;
+    padding: 17px;
+    box-shadow: 0 20px 50px rgba(70,70,110,0.18), inset 0 1px 0 rgba(255,255,255,0.7);
+    overflow: hidden;
+  }
+  .header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; }
+  .title { font-size: 13px; font-weight: 600; color: var(--on-surface); letter-spacing: 0.3px; }
+  .date { font-size: 10px; color: var(--on-surface-variant); font-variant-numeric: tabular-nums; }
 
-  .streak { display: flex; align-items: baseline; gap: 6px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,220,180,0.08); }
-  .streak-num { font-size: 32px; font-weight: 700; color: #ffb86c; font-variant-numeric: tabular-nums; line-height: 1; }
-  .streak-label { font-size: 10px; color: rgba(232,220,200,0.6); }
-  .streak-fire { margin-left: auto; font-size: 18px; }
+  .streak { display: flex; align-items: baseline; gap: 8px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(73,69,79,0.12); }
+  .streak-num { font-size: 42px; font-weight: 700; color: var(--primary); font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -1px; text-shadow: none; }
+  .streak-label { font-size: 11px; color: var(--on-surface-variant); }
+  .streak-fire { margin-left: auto; font-size: 21px; }
 
-  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-  .stat { background: rgba(255,220,180,0.04); border-radius: 10px; padding: 9px 10px; }
-  .stat-label { font-size: 9px; color: rgba(232,220,200,0.5); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px; }
-  .stat-value { font-size: 16px; font-weight: 600; color: #e8dcc8; font-variant-numeric: tabular-nums; }
-  .stat-unit { font-size: 10px; font-weight: 400; color: rgba(232,220,200,0.5); }
-  .stat-sub { font-size: 9px; color: rgba(232,220,200,0.4); margin-top: 1px; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+  .stat { position: relative; background: rgba(103,80,164,0.15); border-radius: 14px; padding: 11px 12px; cursor: pointer; user-select: none; -webkit-user-select: none; transition: background 0.15s; }
+  .stat:hover { background: rgba(103,80,164,0.20); }
+  .stat:active { transform: scale(0.98); }
+  .stat .face-back { display: none; }
+  .stat.flipped .face-front { display: none; }
+  .stat.flipped .face-back { display: block; }
+  .stat::after { content: ''; position: absolute; top: 12px; right: 11px; width: 5px; height: 5px; border-right: 1.5px solid rgba(73,69,79,0.45); border-bottom: 1.5px solid rgba(73,69,79,0.45); transform: rotate(45deg); transition: transform 0.2s, border-color 0.15s; }
+  .stat:hover::after { border-color: var(--primary); }
+  .stat.flipped::after { transform: rotate(225deg); }
+  .stat-label { font-size: 10px; color: var(--on-surface-variant); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+  .stat-value { font-size: 19px; font-weight: 600; color: var(--on-surface); font-variant-numeric: tabular-nums; }
+  .stat-unit { font-size: 11px; font-weight: 400; color: var(--on-surface-variant); }
+  .stat-sub { font-size: 10px; color: var(--outline); margin-top: 2px; }
 
-  .progress-section { margin-bottom: 12px; }
-  .progress-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
-  .progress-title { font-size: 10px; color: rgba(232,220,200,0.65); }
-  .progress-pct { font-size: 10px; color: #ffb86c; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .bar { height: 5px; background: rgba(255,220,180,0.08); border-radius: 2.5px; overflow: hidden; }
-  .bar-fill { height: 100%; background: linear-gradient(90deg, #ffb86c, #ff9854); border-radius: 2.5px; transition: width 0.3s; }
+  .progress-section { margin-bottom: 15px; }
+  .progress-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .progress-title { font-size: 11px; color: var(--on-surface-variant); }
+  .progress-pct { font-size: 11px; color: var(--primary); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .bar { height: 6px; background: rgba(103,80,164,0.22); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--tertiary)); border-radius: 3px; transition: width 0.3s; }
 
-  .goal-input { background: transparent; border: none; color: inherit; font: inherit; width: 28px; text-align: center; padding: 0 2px; border-bottom: 1px dashed rgba(255,184,108,0.4); font-variant-numeric: tabular-nums; outline: none; cursor: text; }
-  .goal-input:focus { border-bottom-color: #ffb86c; color: #ffb86c; }
+  .goal-input { background: transparent; border: none; color: var(--primary); font: inherit; font-weight: 600; width: 30px; text-align: center; padding: 0 2px; border-bottom: 1px dashed rgba(103,80,164,0.45); font-variant-numeric: tabular-nums; outline: none; cursor: text; }
+  .goal-input:focus { border-bottom-color: var(--primary); }
   .goal-input::-webkit-inner-spin-button, .goal-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
-  .current { background: rgba(255,220,180,0.05); border-radius: 10px; padding: 10px; margin-bottom: 12px; display: flex; gap: 10px; }
-  .cover { width: 34px; height: 46px; background: linear-gradient(135deg, #6b4423, #4a2e18); border-radius: 3px; flex-shrink: 0; box-shadow: 0 3px 8px rgba(0,0,0,0.4); background-size: cover; background-position: center; }
+  .current { background: rgba(103,80,164,0.15); border-radius: 14px; padding: 12px; margin-bottom: 15px; display: flex; gap: 12px; }
+  .cover { width: 40px; height: 54px; background: linear-gradient(135deg, #4F378B, #381E72); border-radius: 4px; flex-shrink: 0; box-shadow: 0 3px 10px rgba(0,0,0,0.45); background-size: cover; background-position: center; }
   .current-info { flex: 1; min-width: 0; }
-  .current-label { font-size: 9px; color: rgba(232,220,200,0.45); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px; }
-  .current-title { font-size: 12px; font-weight: 600; color: #e8dcc8; margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .current-author { font-size: 10px; color: rgba(232,220,200,0.55); margin-bottom: 6px; }
-  .current-bar { height: 3px; background: rgba(255,220,180,0.08); border-radius: 1.5px; overflow: hidden; margin-bottom: 3px; }
-  .current-bar-fill { height: 100%; background: #ffb86c; border-radius: 1.5px; }
-  .current-meta { display: flex; justify-content: flex-end; font-size: 9px; color: rgba(232,220,200,0.5); font-variant-numeric: tabular-nums; }
+  .current-label { font-size: 10px; color: var(--on-surface-variant); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+  .current-title { font-size: 14px; font-weight: 600; color: var(--on-surface); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .current-author { font-size: 11px; color: var(--on-surface-variant); margin-bottom: 8px; }
+  .current-bar { height: 4px; background: rgba(103,80,164,0.22); border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
+  .current-bar-fill { height: 100%; background: var(--primary); border-radius: 2px; }
+  .current-meta { display: flex; justify-content: flex-end; font-size: 10px; color: var(--on-surface-variant); font-variant-numeric: tabular-nums; }
 
-  .finished { display: flex; justify-content: space-between; align-items: center; padding: 9px 11px; background: rgba(255,220,180,0.04); border-radius: 10px; margin-bottom: 12px; }
-  .finished-left { display: flex; align-items: baseline; gap: 6px; }
-  .finished-num { font-size: 22px; font-weight: 700; color: #e8dcc8; font-variant-numeric: tabular-nums; }
-  .finished-label { font-size: 10px; color: rgba(232,220,200,0.6); }
-  .finished-meta { font-size: 9px; color: rgba(232,220,200,0.45); text-align: right; line-height: 1.4; }
+  .finished { display: flex; justify-content: space-between; align-items: center; padding: 11px 13px; background: rgba(103,80,164,0.13); border-radius: 14px; margin-bottom: 15px; }
+  .finished-left { display: flex; align-items: baseline; gap: 7px; }
+  .finished-num { font-size: 26px; font-weight: 700; color: var(--on-surface); font-variant-numeric: tabular-nums; letter-spacing: -0.5px; }
+  .finished-label { font-size: 11px; color: var(--on-surface-variant); }
+  .finished-meta { font-size: 10px; color: var(--outline); text-align: right; line-height: 1.4; }
 
-  .quote { font-size: 10px; color: rgba(232,220,200,0.55); line-height: 1.4; padding: 9px 11px; margin-bottom: 12px; background: rgba(255,220,180,0.03); border-left: 2px solid rgba(255,184,108,0.4); border-radius: 0 6px 6px 0; }
+  .quote { font-size: 11px; color: var(--on-surface-variant); line-height: 1.5; padding: 11px 13px; margin-bottom: 15px; background: rgba(103,80,164,0.11); border-left: 2px solid var(--primary); border-radius: 0 8px 8px 0; }
   .quote:empty { display: none; }
 
-  .footer { display: flex; justify-content: space-between; align-items: center; font-size: 9px; color: rgba(232,220,200,0.35); }
-  .last-read { display: flex; align-items: center; gap: 4px; }
-  .dot { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; }
+  .footer { display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--outline); }
+  .last-read { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 6px; height: 6px; background: #3FA968; border-radius: 50%; box-shadow: 0 0 6px rgba(63,169,104,0.45); }
 </style>
 </head>
 <body>
@@ -84,21 +101,35 @@
     </div>
 
     <div class="stats">
-      <div class="stat">
-        <div class="stat-label">今日</div>
-        <div class="stat-value">{{TODAY_MIN}}<span class="stat-unit"> 分</span></div>
-        <div class="stat-sub">日均 {{DAY_AVG}}</div>
+      <div class="stat" onclick="this.classList.toggle('flipped')">
+        <div class="face face-front">
+          <div class="stat-label">今日</div>
+          <div class="stat-value">{{TODAY_MIN}}<span class="stat-unit"> 分</span></div>
+          <div class="stat-sub">日均 {{DAY_AVG}}</div>
+        </div>
+        <div class="face face-back">
+          <div class="stat-label">本周</div>
+          <div class="stat-value">{{WEEK_HM}}</div>
+          <div class="stat-sub">日均 {{WEEK_DAY_AVG}}</div>
+        </div>
       </div>
-      <div class="stat">
-        <div class="stat-label">本月</div>
-        <div class="stat-value">{{MONTH_HOURS}}<span class="stat-unit"> 小时</span></div>
-        <div class="stat-sub">上月 {{LAST_MONTH_HOURS}}h</div>
+      <div class="stat" onclick="this.classList.toggle('flipped')">
+        <div class="face face-front">
+          <div class="stat-label">本月</div>
+          <div class="stat-value">{{MONTH_HOURS}}<span class="stat-unit"> 小时</span></div>
+          <div class="stat-sub">上月 {{LAST_MONTH_HOURS}}h</div>
+        </div>
+        <div class="face face-back">
+          <div class="stat-label">今年</div>
+          <div class="stat-value">{{YEAR_HOURS}}<span class="stat-unit"> 小时</span></div>
+          <div class="stat-sub">日均 {{YEAR_DAY_AVG}}</div>
+        </div>
       </div>
     </div>
 
     <div class="progress-section">
       <div class="progress-row">
-        <div class="progress-title">本月目标 · <input class="goal-input" id="goalInput" type="number" min="1" max="999" value="{{GOAL_HOURS}}" oninput="var g=Math.max(1,parseInt(this.value)||1),p=Math.min(100,Math.round({{CURRENT_MONTH_HOURS_JS}}/g*100));document.getElementById('goalBar').style.width=p+'%';document.getElementById('goalPct').textContent=p+'%';"> 小时</div>
+        <div class="progress-title">本月目标 · <input class="goal-input" id="goalInput" type="number" min="1" max="999" value="{{GOAL_HOURS}}"> 小时</div>
         <div class="progress-pct" id="goalPct">{{GOAL_PCT}}%</div>
       </div>
       <div class="bar"><div class="bar-fill" id="goalBar" style="width:{{GOAL_PCT}}%"></div></div>
@@ -121,7 +152,6 @@
         <div class="finished-label">今年读完</div>
       </div>
       <div class="finished-meta">
-        累计 {{YEAR_HOURS}} 小时<br>
         {{YEAR_NOTES}} 条笔记
       </div>
     </div>
@@ -135,23 +165,32 @@
   </div>
 
   <script>
-    const CURRENT_HOURS = {{CURRENT_MONTH_HOURS_JS}};
-    const input = document.getElementById('goalInput');
-    const bar = document.getElementById('goalBar');
-    const pct = document.getElementById('goalPct');
-    // persist goal locally so manual edits survive auto-refresh
-    const saved = localStorage.getItem('readingGoalHours');
-    if (saved) { input.value = saved; recompute(); }
-    function recompute() {
-      const goal = Math.max(1, parseInt(input.value) || 1);
-      const p = Math.min(100, Math.round((CURRENT_HOURS / goal) * 100));
-      bar.style.width = p + '%';
-      pct.textContent = p + '%';
-    }
-    input.addEventListener('input', () => {
-      localStorage.setItem('readingGoalHours', input.value);
-      recompute();
-    });
+    (function () {
+      var input = document.getElementById('goalInput');
+      var bar = document.getElementById('goalBar');
+      var pct = document.getElementById('goalPct');
+      var MONTH = {{MONTH_HOURS}};
+      function recompute() {
+        var g = Math.max(1, Math.min(999, parseInt(input.value) || 1));
+        var p = Math.min(100, Math.round(MONTH / g * 100));
+        bar.style.width = p + '%';
+        pct.textContent = p + '%';
+      }
+      var timer;
+      input.addEventListener('input', function () {
+        recompute();
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+          var g = Math.max(1, Math.min(999, parseInt(input.value) || 1));
+          // persist to config.json via the local helper (no-op if opened without it)
+          fetch('/set-goal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ goal: g })
+          }).catch(function () {});
+        }, 600);
+      });
+    })();
   </script>
 </body>
 </html>

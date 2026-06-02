@@ -3,7 +3,7 @@
 import os, json, time, datetime, pathlib, urllib.request, urllib.error, html as htmllib
 
 API = "https://i.weread.qq.com/api/agent/gateway"
-SKILL_VERSION = "1.0.3"
+SKILL_VERSION = "1.1.0"
 ROOT = pathlib.Path(__file__).parent
 CONFIG = json.loads((ROOT / "config.json").read_text())
 
@@ -18,6 +18,9 @@ def _load_key():
         return None
 
 KEY = _load_key()
+
+# Crude terms to keep out of the rotating desktop quote.
+QUOTE_BLOCKLIST = ("鸡巴", "屌", "傻逼", "煞笔", "草泥马", "卧槽", "妈的", "婊", "贱人", "fuck", "shit")
 
 
 def call(api_name, **params):
@@ -90,6 +93,15 @@ def compute_streak_and_today(threshold=60, max_weeks=10):
     return streak, today_min
 
 
+def week_total_seconds(date_in_week):
+    """Total reading seconds for the week containing date_in_week."""
+    data = fetch_week(date_in_week)
+    total = data.get("totalReadTime")
+    if not total:
+        total = sum(int(v) for v in data.get("readTimes", {}).values())
+    return int(total or 0)
+
+
 def find_current_book():
     shelf = call("/shelf/sync")
     books = shelf.get("books", [])
@@ -122,6 +134,12 @@ def main():
 
     streak, today_min = compute_streak_and_today()
 
+    # this-week total + daily average (for the 今日→本周 drill-down)
+    week_total_sec = week_total_seconds(today)
+    days_elapsed = today.weekday() + 1
+    week_hm = fmt_hm(week_total_sec)
+    week_day_avg = fmt_hm(week_total_sec // days_elapsed if days_elapsed else 0)
+
     month_total_sec = monthly.get("totalReadTime", 0)
     month_hours = month_total_sec // 3600
     day_avg = fmt_hm(monthly.get("dayAverageReadTime", 0))
@@ -129,7 +147,10 @@ def main():
 
     year_finished = parse_stat_count(annual, "读完")
     year_notes = parse_stat_count(annual, "笔记")
-    year_total_hours = annual.get("totalReadTime", 0) // 3600
+    year_total_sec = annual.get("totalReadTime", 0)
+    year_total_hours = year_total_sec // 3600
+    day_of_year = today.timetuple().tm_yday
+    year_day_avg = fmt_hm(year_total_sec // day_of_year if day_of_year else 0)
 
     book = find_current_book()
     quote = ""
@@ -147,7 +168,10 @@ def main():
         try:
             bm = call("/book/bestbookmarks", bookId=book["bookId"])
             items = bm.get("items", [])
-            candidates = [i.get("markText", "").strip() for i in items if 15 <= len(i.get("markText", "").strip()) <= 70]
+            candidates = [
+                t for t in (i.get("markText", "").strip() for i in items)
+                if 15 <= len(t) <= 70 and not any(w in t.lower() for w in QUOTE_BLOCKLIST)
+            ]
             if candidates:
                 idx = today.toordinal() % len(candidates)
                 quote = candidates[idx]
@@ -176,13 +200,15 @@ def main():
         "LAST_MONTH_HOURS": str(last_month_hours),
         "GOAL_HOURS": str(goal_hours),
         "GOAL_PCT": str(goal_pct),
-        "CURRENT_MONTH_HOURS_JS": str(month_hours),
+        "WEEK_HM": week_hm,
+        "WEEK_DAY_AVG": week_day_avg,
         "BOOK_TITLE": htmllib.escape(book_title),
         "BOOK_AUTHOR": htmllib.escape(book_author),
         "BOOK_COVER": htmllib.escape(book_cover),
         "BOOK_PROGRESS": str(progress),
         "YEAR_FINISHED": str(year_finished),
         "YEAR_HOURS": str(year_total_hours),
+        "YEAR_DAY_AVG": year_day_avg,
         "YEAR_NOTES": str(year_notes),
         "LAST_READ": htmllib.escape(relative_time(last_read)),
         "UPDATED_AT": datetime.datetime.now().strftime("%H:%M"),

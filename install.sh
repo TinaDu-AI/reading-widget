@@ -3,21 +3,17 @@ set -e
 
 # Reading Widget installer
 # 1) Copies runtime files to ~/Desktop/reading-widget/
-# 2) Installs Übersicht widget to ~/Library/Application Support/Übersicht/widgets/reading.widget/
-# 3) Runs update.py once to generate widget.html
+# 2) Runs update.py once to generate widget.html
+# 3) Tells you how to open the card (local helper + frameless Chrome window)
 
 SRC="$(cd "$(dirname "$0")" && pwd)"
 DEST="$HOME/Desktop/reading-widget"
-UBER="$HOME/Library/Application Support/Übersicht/widgets/reading.widget"
 
 echo "→ Installing runtime to $DEST"
 mkdir -p "$DEST"
-cp "$SRC/update.py" "$SRC/template.html" "$DEST/"
+cp "$SRC/update.py" "$SRC/template.html" "$SRC/server.py" "$SRC/open-widget.sh" "$DEST/"
+chmod +x "$DEST/open-widget.sh"
 [ -f "$DEST/config.json" ] || cp "$SRC/config.default.json" "$DEST/config.json"
-
-echo "→ Installing Übersicht widget to $UBER"
-mkdir -p "$UBER"
-cp "$SRC/ubersicht/reading.widget/index.coffee" "$UBER/"
 
 if [ -z "$WEREAD_API_KEY" ] && ! grep -q WEREAD_API_KEY "$HOME/.claude/settings.json" 2>/dev/null; then
   echo ""
@@ -34,5 +30,10 @@ python3 "$DEST/update.py"
 
 echo ""
 echo "✅ Installed."
-echo "   Open Übersicht (brew install --cask ubersicht), then menu → Refresh All Widgets."
-echo "   Widget will appear at top-left of your desktop."
+echo "   Open the widget:  bash $DEST/open-widget.sh"
+echo "   (starts the local helper on 127.0.0.1:47900 and opens a frameless Chrome window;"
+echo "    on-card goal edits then persist and data auto-refreshes every 30 min)"
+echo ""
+echo "   Optional · keep the helper running at login — see SKILL.md Step 4 (launchd)."
+echo "   Optional · Übersicht — copy ubersicht/reading.widget to"
+echo "   ~/Library/Application Support/Übersicht/widgets/ and Refresh All Widgets."
