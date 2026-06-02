@@ -129,7 +129,7 @@
 
     <div class="progress-section">
       <div class="progress-row">
-        <div class="progress-title">本月目标 · <input class="goal-input" id="goalInput" type="number" min="1" max="999" value="{{GOAL_HOURS}}"> 小时</div>
+        <div class="progress-title">本月目标 · <input class="goal-input" id="goalInput" type="number" min="1" max="999" value="{{GOAL_HOURS}}" oninput="var g=Math.max(1,Math.min(999,parseInt(this.value)||1));var p=Math.min(100,Math.round({{MONTH_HOURS}}/g*100));document.getElementById('goalBar').style.width=p+'%';document.getElementById('goalPct').textContent=p+'%';clearTimeout(window.__goalTimer);window.__goalTimer=setTimeout(function(){fetch('http://127.0.0.1:47900/set-goal',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({goal:g})}).catch(function(){});},600);"> 小时</div>
         <div class="progress-pct" id="goalPct">{{GOAL_PCT}}%</div>
       </div>
       <div class="bar"><div class="bar-fill" id="goalBar" style="width:{{GOAL_PCT}}%"></div></div>
@@ -163,34 +163,5 @@
       <div>{{UPDATED_AT}} 更新</div>
     </div>
   </div>
-
-  <script>
-    (function () {
-      var input = document.getElementById('goalInput');
-      var bar = document.getElementById('goalBar');
-      var pct = document.getElementById('goalPct');
-      var MONTH = {{MONTH_HOURS}};
-      function recompute() {
-        var g = Math.max(1, Math.min(999, parseInt(input.value) || 1));
-        var p = Math.min(100, Math.round(MONTH / g * 100));
-        bar.style.width = p + '%';
-        pct.textContent = p + '%';
-      }
-      var timer;
-      input.addEventListener('input', function () {
-        recompute();
-        clearTimeout(timer);
-        timer = setTimeout(function () {
-          var g = Math.max(1, Math.min(999, parseInt(input.value) || 1));
-          // persist to config.json via the local helper (no-op if opened without it)
-          fetch('/set-goal', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ goal: g })
-          }).catch(function () {});
-        }, 600);
-      });
-    })();
-  </script>
 </body>
 </html>

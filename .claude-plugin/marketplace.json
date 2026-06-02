@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "macOS desktop widget showing WeRead reading stats (streak, today/month time, current book, year quote). Local helper persists your monthly goal and auto-refreshes.",
-    "version": "1.1.0"
+    "version": "1.1.1"
   },
   "plugins": [
     {

@@ -80,7 +80,9 @@ def auto_refresh():
 
 
 if __name__ == "__main__":
-    regenerate()  # fresh data on startup
+    # Bind the port first, then refresh data in the background. A blocked WeRead
+    # fetch (e.g. launchd has no proxy env) must not delay the port coming up.
+    threading.Thread(target=regenerate, daemon=True).start()
     threading.Thread(target=auto_refresh, daemon=True).start()
     print(f"[helper] reading-widget on http://127.0.0.1:{PORT}", flush=True)
     ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
